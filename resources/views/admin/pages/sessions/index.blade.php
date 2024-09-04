@@ -2,9 +2,6 @@
 
 @section('admin_content')
 
-
-
-
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
@@ -18,47 +15,44 @@
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-
-    @endif
-
-
+        @endif
 
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Title</th>
-
                     <th>Department</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($sessions as $session)
-                    <tr>
-                        <td>{{ $session->title }}</td>
+                    @if($session->is_hide !== 'block') <!-- Only show rows where is_hide is not 'block' -->
+                        <tr>
+                            <td>{{ $session->title }}</td>
+                            <td>{{ $session->department }}</td>
+                            <td>
+                                <a href="{{ route('sessions.show', ['session' => $session->id, 'token' => $token]) }}" class="btn btn-inverse-info btn-fw" style="display:inline-block;">
+                                    <i class="mdi mdi-eye-outline"></i>
+                                    View
+                                </a>
+                                <a href="{{ route('sessions.edit', ['session' => $session->id, 'token' => $token]) }}" class="btn btn-inverse-success btn-fw" style="display:inline-block;">
+                                    <i class="mdi mdi-pencil-outline"></i>
+                                    Edit
+                                </a>
 
-                        <td>{{ $session->department }}</td>
-                        <td>
-                            <a href="{{ route('sessions.show', ['session' => $session->id, 'token' => $token]) }}" class="btn btn-inverse-info btn-fw" style="display:inline-block;">
-                                <i class="mdi mdi-eye-outline"></i>
-                                View
-                            </a>
-                            <a href="{{ route('sessions.edit', ['session' => $session->id, 'token' => $token]) }}" class="btn btn-inverse-success btn-fw" style="display:inline-block;">
-                                <i class="mdi mdi-pencil-outline"></i>
-                                Edit
-                            </a>
+                                <form action="{{ route('sessions.destroy', ['session' => $session->id, 'token' => $token]) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-inverse-danger btn-fw">
+                                        <i class="mdi mdi-trash-can-outline"></i>
+                                        Delete
+                                    </button>
+                                </form>
 
-                            <form action="{{ route('sessions.destroy', ['session' => $session->id, 'token' => $token]) }}" method="POST" style="display:inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-inverse-danger btn-fw">
-                                    <i class="mdi mdi-trash-can-outline"></i>
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
+                            </td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>
@@ -93,6 +87,6 @@
     @elseif (session('error'))
         showToast('{{ session('error') }}', 'error');
     @endif
-</script>
+  </script>
 
 @endsection

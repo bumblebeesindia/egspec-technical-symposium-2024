@@ -37,6 +37,7 @@ Route::get('/test-pdf', function () {
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegistrationMail;
 
+
 Route::get('/test-mail', function () {
     $event_registration_id = 'INV-66D2FBBCE59368.40160966';
 
@@ -69,7 +70,7 @@ Route::get('/test-mail', function () {
     ];
 
     // Generate the PDF
-    $pdf = Pdf::loadView('pages.pdf-view', [
+    $pdf = PDF::loadView('pages.pdf-view', [
         'registration' => $registration,
         'sessionEvents' => $sessionEvents
     ])->setOptions([
@@ -90,23 +91,28 @@ Route::get('/test-mail', function () {
     $pdfPath = storage_path('app/public/' . $fileName);
     $pdf->save($pdfPath);
 
-    // Check if file exists
+    // Debugging: Check if the PDF file was generated and saved
     if (!file_exists($pdfPath)) {
-        return 'PDF file was not generated.';
+        return 'PDF file was not generated. Check the path and permissions.';
     }
 
     // Send the email with the PDF attachment
-    Mail::to($registration->email)->send(new RegistrationMail($data, $pdfPath, $event->title));
-    // Check if file is attached
+    try {
+        Mail::to('raghavanofficials@gmail.com')->send(new RegistrationMail($data, $pdfPath, $event->title));
+    } catch (\Exception $e) {
+        return 'Failed to send email: ' . $e->getMessage();
+    }
+
+    // Debugging: Check if file is attached and optionally delete the PDF
     if (file_exists($pdfPath)) {
-        // Optionally delete the PDF after sending the email
-        unlink($pdfPath);
+        unlink($pdfPath); // Optionally delete the PDF after sending the email
     } else {
         return 'PDF file was not found after sending the email.';
     }
 
     return 'Email sent successfully!';
 });
+
 
 
 

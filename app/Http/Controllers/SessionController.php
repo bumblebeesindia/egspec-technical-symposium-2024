@@ -35,7 +35,7 @@ class SessionController extends Controller
         }
 
         $user = Auth::guard('admin')->user();
-        $sessions = Session::all();
+        $sessions = Session::where('is_hide', 'show')->get();
 
         return view('admin.pages.sessions.index', compact('user', 'sessions', 'token'));
     }
@@ -111,10 +111,13 @@ class SessionController extends Controller
     // Delete a session
     public function destroy(Session $session)
     {
-        $session->delete();
+        // Update the 'is_hide' field instead of deleting the record
+        $session->update(['is_hide' => 'block']);
+
         return redirect()->route('sessions.index', ['token' => request()->session()->get('admin_auth_token')])
-            ->with('success', 'Session deleted successfully.');
+            ->with('success', 'Session marked as hidden successfully.');
     }
+
 
 
 

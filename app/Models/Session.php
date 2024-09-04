@@ -32,6 +32,7 @@ class Session extends Model
         'meeting_url',
         'price_type',
         'amount',
+        'is_hide',
     ];
 
     // Define the relationship with EventRegistration
